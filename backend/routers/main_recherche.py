@@ -395,18 +395,73 @@ def _compute_spatial_bonus(item: dict) -> int:
     return int(round(same_room_bonus + distance_bonus))
 
 
+def _has_defined_position(data: SearchRequest) -> bool:
+    room = str(data.user_room or "").strip()
+    try:
+        ux = float(data.user_x)
+        uy = float(data.user_y)
+        uz = float(data.user_z)
+    except Exception:
+        ux, uy, uz = 0.0, 0.0, 0.0
+    return bool(room) or not (ux == 0.0 and uy == 0.0 and uz == 0.0)
+
+
+def _prefix_bonus(item: dict, query_norm: str, tokens: list[str]) -> int:
+    """Bonus de stabilisation pendant la frappe (requetes prefixes)."""
+    if not query_norm:
+        return 0
+
+    name_norm = normalize_text(item.get("name", ""))
+    type_norm = normalize_text(item.get("type", ""))
+    room_norm = normalize_text((item.get("location") or {}).get("room", "") if isinstance(item.get("location"), dict) else item.get("location", ""))
+    desc_norm = normalize_text(item.get("description", ""))
+
+    bonus = 0
+
+    # Forte priorite sur prefixe du nom (meilleure stabilite UX).
+    if name_norm.startswith(query_norm):
+        bonus += 45
+    elif f" {query_norm}" in name_norm:
+        bonus += 22
+
+    if type_norm.startswith(query_norm):
+        bonus += 18
+    if room_norm.startswith(query_norm):
+        bonus += 12
+    if desc_norm.startswith(query_norm):
+        bonus += 6
+
+    # Bonus par token prefixe pour les requetes multi-mots.
+    for tok in tokens:
+        if not tok:
+            continue
+        if name_norm.startswith(tok):
+            bonus += 10
+        if type_norm.startswith(tok):
+            bonus += 5
+
+    return bonus
+
+
 def _search_logic(data: SearchRequest) -> list[dict]:
     raw_query = (data.search_query or "").strip()
+    position_defined = _has_defined_position(data)
 
     if not raw_query:
         results = list(things_collection.find({}).sort("name", 1))
-        compute_distance_and_room_flags(results, data.user_x, data.user_y, data.user_z, data.user_room)
+        if position_defined:
+            compute_distance_and_room_flags(results, data.user_x, data.user_y, data.user_z, data.user_room)
+        else:
+            for item in results:
+                item["same_room"] = False
+                item["distance"] = None
 
         results.sort(key=lambda x: (
             0 if x.get("same_room") else 1,
-            float(x.get("distance", 10**9)),
+            float(x.get("distance", 10**9)) if x.get("distance") is not None else 10**9,
             -int(x.get("view_count", 0)),
             normalize_text(x.get("name", "")),
+            str(x.get("id", "")),
         ))
 
         for item in results:
@@ -454,7 +509,12 @@ def _search_logic(data: SearchRequest) -> list[dict]:
                 candidates.append(item)
 
     # Etape C: scoreTextuel + bonusSpatial => scoreFinal.
-    compute_distance_and_room_flags(candidates, data.user_x, data.user_y, data.user_z, data.user_room)
+    if position_defined:
+        compute_distance_and_room_flags(candidates, data.user_x, data.user_y, data.user_z, data.user_room)
+    else:
+        for item in candidates:
+            item["same_room"] = False
+            item["distance"] = None
 
     for item in candidates:
         item_id = str(item.get("id", "")).strip()
@@ -481,18 +541,20 @@ def _search_logic(data: SearchRequest) -> list[dict]:
         for tok in tokens:
             if tok and any(tok in f for f in fields_norm):
                 lexical_hit_bonus += 4
+        prefix_bonus = _prefix_bonus(item, q_norm, tokens)
         score_textuel = score_index + score_pertinence
-        score_textuel += lexical_hit_bonus + intent_bonus + status_bonus + fuzzy_bonus
-        bonus_spatial = _compute_spatial_bonus(item)
+        score_textuel += lexical_hit_bonus + intent_bonus + status_bonus + fuzzy_bonus + prefix_bonus
+        bonus_spatial = _compute_spatial_bonus(item) if position_defined else 0
         item["_score_final"] = int(score_textuel + bonus_spatial)
 
     # Etape D + E: tri par score final puis tie-break spatial/popularite/nom.
     candidates.sort(key=lambda x: (
         -int(x.get("_score_final", 0)),
         0 if x.get("same_room") else 1,
-        float(x.get("distance", 10**9)),
+        float(x.get("distance", 10**9)) if x.get("distance") is not None else 10**9,
         -int(x.get("view_count", 0)),
         normalize_text(x.get("name", "")),
+        str(x.get("id", "")),
     ))
 
     for item in candidates:
