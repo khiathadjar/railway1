@@ -456,13 +456,21 @@ def _search_logic(data: SearchRequest) -> list[dict]:
                 item["same_room"] = False
                 item["distance"] = None
 
-        results.sort(key=lambda x: (
-            0 if x.get("same_room") else 1,
-            float(x.get("distance", 10**9)) if x.get("distance") is not None else 10**9,
-            -int(x.get("view_count", 0)),
-            normalize_text(x.get("name", "")),
-            str(x.get("id", "")),
-        ))
+        if position_defined:
+            results.sort(key=lambda x: (
+                float(x.get("distance", 10**9)) if x.get("distance") is not None else 10**9,
+                -int(x.get("view_count", 0)),
+                normalize_text(x.get("name", "")),
+                str(x.get("id", "")),
+            ))
+        else:
+            results.sort(key=lambda x: (
+                0 if x.get("same_room") else 1,
+                float(x.get("distance", 10**9)) if x.get("distance") is not None else 10**9,
+                -int(x.get("view_count", 0)),
+                normalize_text(x.get("name", "")),
+                str(x.get("id", "")),
+            ))
 
         for item in results:
             item["_id"] = str(item["_id"])
@@ -548,14 +556,23 @@ def _search_logic(data: SearchRequest) -> list[dict]:
         item["_score_final"] = int(score_textuel + bonus_spatial)
 
     # Etape D + E: tri par score final puis tie-break spatial/popularite/nom.
-    candidates.sort(key=lambda x: (
-        -int(x.get("_score_final", 0)),
-        0 if x.get("same_room") else 1,
-        float(x.get("distance", 10**9)) if x.get("distance") is not None else 10**9,
-        -int(x.get("view_count", 0)),
-        normalize_text(x.get("name", "")),
-        str(x.get("id", "")),
-    ))
+    if position_defined:
+        candidates.sort(key=lambda x: (
+            float(x.get("distance", 10**9)) if x.get("distance") is not None else 10**9,
+            -int(x.get("_score_final", 0)),
+            -int(x.get("view_count", 0)),
+            normalize_text(x.get("name", "")),
+            str(x.get("id", "")),
+        ))
+    else:
+        candidates.sort(key=lambda x: (
+            -int(x.get("_score_final", 0)),
+            0 if x.get("same_room") else 1,
+            float(x.get("distance", 10**9)) if x.get("distance") is not None else 10**9,
+            -int(x.get("view_count", 0)),
+            normalize_text(x.get("name", "")),
+            str(x.get("id", "")),
+        ))
 
     for item in candidates:
         item["_id"] = str(item["_id"])
