@@ -589,6 +589,41 @@ function normalizeRoom(value) {
     .trim();
 }
 
+const ROOM_ALIASES_LOCAL = {
+  "archives dir.": "Archives Direction E4",
+  "archives dir": "Archives Direction E4",
+  "archives executif": "Archives Direction E10",
+  "archives 5": "Archives E5",
+  "archives": "Archives E2",
+  "presse": "Salle de Presse E2",
+  "salle de presse": "Salle de Presse E2",
+  "salle du presse": "Salle de Presse E2"
+};
+
+function canonicalRoomFromCache(room) {
+  const raw = String(room || "").trim();
+  if (!raw) return "";
+  const normalized = normalizeRoom(raw);
+
+  for (const name of Object.keys(roomCoordsCache || {})) {
+    if (normalizeRoom(name) === normalized) {
+      return name;
+    }
+  }
+
+  const alias = ROOM_ALIASES_LOCAL[normalized];
+  if (alias) {
+    for (const name of Object.keys(roomCoordsCache || {})) {
+      if (normalizeRoom(name) === normalizeRoom(alias)) {
+        return name;
+      }
+    }
+    return alias;
+  }
+
+  return raw;
+}
+
 function getCoordsFromCache(room) {
   if (!room || !roomCoordsCache) return null;
   const normalized = normalizeRoom(room);
@@ -1014,7 +1049,11 @@ async function loadUserThings(query) {
   try {
     await loadRoomCoords();
 
-    const user_room = localStorage.getItem('user_room') || '';
+    const storedUserRoom = localStorage.getItem('user_room') || '';
+    const user_room = canonicalRoomFromCache(storedUserRoom);
+    if (user_room && user_room !== storedUserRoom) {
+      localStorage.setItem('user_room', user_room);
+    }
     let user_x = Number(localStorage.getItem('user_x') || 0);
     let user_y = Number(localStorage.getItem('user_y') || 0);
     let user_z = Number(localStorage.getItem('user_z') || 0);
@@ -1687,7 +1726,11 @@ async function initUserDashboard() {
   }
 
   // Récupérer et afficher la position de l'utilisateur
-  const user_room = localStorage.getItem('user_room') || 'Non définie';
+  const storedRoom = localStorage.getItem('user_room') || 'Non définie';
+  const user_room = canonicalRoomFromCache(storedRoom) || storedRoom;
+  if (user_room !== storedRoom && user_room !== 'Non définie') {
+    localStorage.setItem('user_room', user_room);
+  }
   if (userCurrentPos) {
     userCurrentPos.textContent = user_room;
   }

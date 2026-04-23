@@ -19,26 +19,75 @@ class SearchRequest(BaseModel):
 
 
 SYNONYM_GROUPS = [
-    {"light", "lights", "lamp", "lampe", "luminaire", "ampoule", "eclairage", "lighting", "lumiere", "led"},
-    {"printer", "imprimante", "imprim", "print", "imprimante3d", "print3d"},
+    {"light", "lights", "lamp", "lampe", "luminaire", "ampoule", "eclairage", "lighting", "lumiere", "led", "spot", "neon", "plafonnier"},
+    {"switchlight", "variateur", "dimmer", "interrupteur", "interrupteur_lumiere", "lightswitch"},
+    {"smartplug", "prise", "priseconnectee", "outlet", "socket", "plug", "powerplug", "smart_socket"},
+    {"powerstrip", "multiprise", "pdu", "rackpdu", "distribution", "powerbar"},
+    {"printer", "imprimante", "imprim", "print", "imprimante3d", "print3d", "laserjet", "inkjet"},
+    {"scanner", "scan", "numeriseur", "scaner", "scannerdoc"},
+    {"copier", "photocopieur", "photocopie", "xerox", "multifonction", "mfp"},
     {"projector", "projecteur", "videoprojecteur", "beamer", "projo"},
+    {"screen", "ecranprojection", "projector_screen", "toile", "canvas"},
+    {"tv", "tele", "televiseur", "television", "smarttv", "ecran", "screen", "display"},
+    {"monitor", "moniteur", "display", "ecranpc", "desktopmonitor"},
+    {"whiteboard", "tableau", "smartboard", "interactiveboard", "tableauinteractif"},
+    {"speaker", "hautparleur", "enceinte", "audio", "soundbar", "sono"},
+    {"microphone", "mic", "micro", "conference_mic", "speakerphone"},
+    {"headset", "casque", "ecouteur", "earbuds", "headphone"},
+    {"cam", "camera", "webcam", "surveillance", "cctv", "ipcam", "ptz", "videocam"},
+    {"doorcam", "interphonevideo", "videophone", "visiophone", "doorbellcam"},
+    {"intercom", "interphone", "combinetelephonique", "talkback"},
+    {"phone", "telephone", "tel", "ipphone", "voip", "deskphone", "handset"},
+    {"tablet", "tablette", "ipad", "androidtablet", "slate"},
+    {"laptop", "pcportable", "notebook", "ultrabook", "portable"},
+    {"desktop", "pcfixe", "workstation", "ordinateur", "computer", "poste"},
+    {"keyboard", "clavier", "keypad"},
+    {"mouse", "souris", "trackpad", "pointer"},
+    {"dock", "dockingstation", "stationaccueil", "dockusb", "usb_c_dock"},
+    {"router", "routeur", "gateway", "box", "internetbox"},
+    {"switch", "commutateur", "switchreseau", "lan_switch", "ethernetswitch"},
+    {"accesspoint", "ap", "wifi", "bornewifi", "wifiap", "hotspot"},
+    {"modem", "fibermodem", "adslmodem", "fai"},
+    {"firewall", "parefeu", "utm", "securitygateway"},
+    {"server", "serveur", "rackserver", "blade", "node"},
+    {"nas", "stockage", "storageserver", "filer", "fileserver"},
+    {"ups", "onduleur", "batterybackup", "alimentationsecours"},
     {"sensor", "capteur", "detecteur", "detector", "probe", "sonde"},
-    {"cam", "camera", "webcam", "surveillance", "cctv"},
-    {"tv", "tele", "televiseur", "television", "smarttv", "ecran", "screen", "monitor", "moniteur", "display"},
-    {
-        "coffee",
-        "cafe",
-        "cafes",
-        "cafeteria",
-        "cafetiere",
-        "cafetier",
-        "espresso",
-        "nespresso",
-        "percolateur",
-        "coffeehouse",
-        "barista",
-    },
-    {"machine", "maker", "coffeemaker", "coffeemachine", "cafemachine", "distributeur", "dispenser"},
+    {"motionsensor", "detecteurmouvement", "pir", "presence", "occupancy"},
+    {"doorsensor", "fenetresensor", "contactsensor", "reed", "magnetique"},
+    {"tempsensor", "temperature", "thermometer", "thermique", "temp"},
+    {"humidity", "humidite", "hygrometre", "humid", "rh"},
+    {"co2", "carbon", "carbon_dioxide", "qualiteair", "airquality"},
+    {"smoke", "fumee", "smokedetector", "firealarm", "alarmeincendie"},
+    {"leak", "fuite", "waterleak", "inondation", "floodsensor"},
+    {"noise", "soundlevel", "decibel", "dbmeter", "bruit"},
+    {"vibration", "vibrationsensor", "shock", "impact"},
+    {"pressure", "pression", "barometre", "pressuresensor"},
+    {"meter", "compteur", "energy_meter", "powermeter", "smartmeter"},
+    {"thermostat", "thermostatconnecte", "temperaturecontrol", "setpoint"},
+    {"hvac", "cvc", "clim", "climatisation", "climate", "ventilation", "airhandling"},
+    {"ac", "airconditioner", "climatiseur", "aircon"},
+    {"heater", "chauffage", "radiateur", "boiler", "chaudiere"},
+    {"fan", "ventilateur", "extracteur", "soufflage"},
+    {"airpurifier", "purificateur", "filtration", "hepa"},
+    {"humidifier", "humidificateur", "brumisateur"},
+    {"dehumidifier", "deshumidificateur", "dryair"},
+    {"blind", "store", "volet", "rideau", "curtain", "shutter"},
+    {"door", "porte", "entrance", "accessdoor"},
+    {"lock", "serrure", "smartlock", "doorlock", "verrou", "badge"},
+    {"reader", "badgeuse", "rfid", "nfc", "cardreader", "controleacces"},
+    {"turnstile", "tourniquet", "portique", "gate", "barriere"},
+    {"elevator", "ascenseur", "lift", "montecharges"},
+    {"escalator", "escaliermecanique", "movingstairs"},
+    {"coffee", "cafe", "cafes", "cafeteria", "cafetiere", "espresso", "nespresso", "percolateur", "coffeehouse", "barista"},
+    {"machine", "maker", "coffeemaker", "coffeemachine", "cafemachine", "distributeur", "dispenser", "vending"},
+    {"fridge", "refrigerateur", "refrigeration", "cooler", "minibar"},
+    {"microwave", "microondes", "fourmicroonde", "microwaveoven"},
+    {"dishwasher", "lavevaisselle", "dish_washer"},
+    {"washingmachine", "lavelinge", "washer"},
+    {"dryer", "sechelinge", "dryer_machine"},
+    {"robot", "robotcleaner", "roomba", "aspirateurrobot", "agv"},
+    {"drone", "uav", "quadcopter", "multirotor"},
     {"electromenager", "electro", "menager", "electro-menager", "appliance", "device"},
 ]
 
@@ -107,6 +156,10 @@ TERM_VOCAB = sorted(
     | {normalize_text(x) for x in STATUS_VALUES}
     | {"coffee", "cafe", "machine", "cafetiere", "television", "projecteur", "imprimante"}
 )
+
+SHORT_TOKEN_SYNONYM_WHITELIST = {
+    "tv", "cam", "nas", "ups", "ap", "rfid", "nfc", "co2", "ac", "cvc", "led", "mic", "pir"
+}
 
 
 def _tokenize_query(text: str) -> list[str]:
@@ -193,6 +246,79 @@ def _expand_tokens(tokens: list[str]) -> list[str]:
     return expanded
 
 
+def _expand_tokens_contextual(tokens: list[str]) -> list[str]:
+    """Expansion prudente: evite les collisions semantiques sur tokens courts (ex: tele)."""
+    expanded: list[str] = []
+    seen: set[str] = set()
+
+    for token in tokens:
+        # Les tokens courts restent litteraux sauf une whitelist metier explicite.
+        if len(token) <= 4 and token not in SHORT_TOKEN_SYNONYM_WHITELIST:
+            variants = {token}
+        else:
+            variants = SYNONYM_MAP.get(token, {token})
+        for variant in variants:
+            if variant not in seen:
+                expanded.append(variant)
+                seen.add(variant)
+
+    return expanded
+
+
+def _collect_lexical_candidates(query_norm: str, tokens: list[str], limit: int = 800) -> list[dict]:
+    """Recupere des candidats par matching direct multi-champs, utile pendant la saisie lettre-par-lettre."""
+    terms = [t for t in tokens if t]
+    if query_norm:
+        terms.append(query_norm)
+
+    # Retirer les doublons en conservant l'ordre.
+    uniq_terms: list[str] = []
+    seen: set[str] = set()
+    for t in terms:
+        if t not in seen:
+            uniq_terms.append(t)
+            seen.add(t)
+
+    if not uniq_terms:
+        return []
+
+    mongo_or = []
+    is_ultra_short = len(query_norm) <= 1
+    is_short = len(query_norm) <= 2
+    for term in uniq_terms:
+        safe = re.escape(term)
+        # Pendant la saisie initiale, utiliser des matchs prefixes pour eviter le bruit.
+        if is_ultra_short:
+            mongo_or.extend([
+                {"search_name_norm": {"$regex": f"^{safe}", "$options": "i"}},
+                {"name": {"$regex": f"^{safe}", "$options": "i"}},
+                {"type": {"$regex": f"^{safe}", "$options": "i"}},
+                {"location.room": {"$regex": f"^{safe}", "$options": "i"}},
+            ])
+        elif is_short:
+            mongo_or.extend([
+                {"search_name_norm": {"$regex": f"^{safe}", "$options": "i"}},
+                {"name": {"$regex": f"^{safe}", "$options": "i"}},
+                {"type": {"$regex": safe, "$options": "i"}},
+                {"location.room": {"$regex": safe, "$options": "i"}},
+                {"description": {"$regex": safe, "$options": "i"}},
+            ])
+        else:
+            mongo_or.extend([
+                {"search_name_norm": {"$regex": safe, "$options": "i"}},
+                {"name": {"$regex": safe, "$options": "i"}},
+                {"type": {"$regex": safe, "$options": "i"}},
+                {"description": {"$regex": safe, "$options": "i"}},
+                {"location.room": {"$regex": safe, "$options": "i"}},
+                {"location": {"$regex": safe, "$options": "i"}},
+                {"status": {"$regex": safe, "$options": "i"}},
+                {"availability": {"$regex": safe, "$options": "i"}},
+            ])
+
+    adaptive_limit = 120 if is_ultra_short else (260 if is_short else limit)
+    return list(things_collection.find({"$or": mongo_or}).limit(adaptive_limit))
+
+
 def _weighted_field_score(item: dict, expanded_tokens: list[str], query_phrase_norm: str) -> int:
     name_norm = normalize_text(item.get("name", ""))
     type_norm = normalize_text(item.get("type", ""))
@@ -260,6 +386,15 @@ def _compute_adaptive_score(
     return total
 
 
+def _compute_spatial_bonus(item: dict) -> int:
+    """Bonus spatial base sur la proximite: meme salle et distance logique."""
+    same_room_bonus = 50 if item.get("same_room") else 0
+    distance = float(item.get("distance", 10**9))
+    # Bonus decroissant avec la distance, borne pour rester stable.
+    distance_bonus = max(0.0, 30.0 - min(distance, 30.0))
+    return int(round(same_room_bonus + distance_bonus))
+
+
 def _search_logic(data: SearchRequest) -> list[dict]:
     raw_query = (data.search_query or "").strip()
 
@@ -291,102 +426,80 @@ def _search_logic(data: SearchRequest) -> list[dict]:
         tokens = [q_norm]
     tokens = [_correct_token(tok) for tok in tokens]
 
-    expanded_tokens = _expand_tokens(tokens)
+    expanded_tokens = _expand_tokens_contextual(tokens)
     query_intents = _extract_query_intents(raw_query, expanded_tokens)
     index_scores = _collect_index_scores(expanded_tokens)
 
-    mongo_or = []
-    for t in expanded_tokens:
-        safe = re.escape(t)
-        mongo_or.extend([
-            {"search_name_norm": {"$regex": safe, "$options": "i"}},
-            {"name": {"$regex": safe, "$options": "i"}},
-            {"type": {"$regex": safe, "$options": "i"}},
-            {"description": {"$regex": safe, "$options": "i"}},
-            {"availability": {"$regex": safe, "$options": "i"}},
-            {"location.room": {"$regex": safe, "$options": "i"}},
-            {"location": {"$regex": safe, "$options": "i"}},
-        ])
+    # Etape A: interroger l'index inverse en premier (noyau principal).
+    candidate_ids = list(index_scores.keys())
+    candidates = list(things_collection.find({"id": {"$in": candidate_ids}})) if candidate_ids else []
 
-    for intent in query_intents:
-        for pattern in INTENT_PATTERNS.get(intent, []):
-            safe_pattern = re.escape(_normalize_phrase(pattern))
-            if safe_pattern:
-                mongo_or.extend([
-                    {"search_name_norm": {"$regex": safe_pattern, "$options": "i"}},
-                    {"name": {"$regex": safe_pattern, "$options": "i"}},
-                    {"type": {"$regex": safe_pattern, "$options": "i"}},
-                    {"description": {"$regex": safe_pattern, "$options": "i"}},
-                ])
+    # Ajout lexical direct (nom/type/salle/description) pour support saisie progressive.
+    lexical_candidates = _collect_lexical_candidates(q_norm, tokens)
+    if lexical_candidates:
+        by_id = {str(item.get("id", "")).strip(): item for item in candidates if str(item.get("id", "")).strip()}
+        for item in lexical_candidates:
+            item_id = str(item.get("id", "")).strip()
+            if item_id:
+                by_id[item_id] = item
+        candidates = list(by_id.values())
 
-    if index_scores:
-        mongo_or.append({"id": {"$in": list(index_scores.keys())}})
-
-    for s in matching_status:
-        mongo_or.append({"status": {"$regex": f"^{re.escape(s)}$", "$options": "i"}})
-
-    pre_results = list(things_collection.find({"$or": mongo_or} if mongo_or else {}))
-
-    filtered = []
-    for item in pre_results:
-        fields = _extract_searchable_fields(item)
-        content_norm = " ".join(normalize_text(f) for f in fields)
-        content_tokens = _token_set(content_norm)
-        item_id = str(item.get("id", "")).strip()
-
-        token_ok = all(
-            any(term in content_tokens for term in SYNONYM_MAP.get(tok, {tok}))
-            for tok in tokens
-        )
-
-        status_ok = False
-        if matching_status:
-            item_status = normalize_text(str(item.get("status", item.get("availability", "")))).replace("hors ligne", "hors-ligne")
-            status_ok = any(item_status == normalize_text(s).replace("hors ligne", "hors-ligne") for s in matching_status)
-
-        focus = _focus_text(item)
-        fuzzy_score = int(fuzz.partial_ratio(q_norm, focus))
-        keyword_score = int(index_scores.get(item_id, 0))
-        intent_match_count = _intent_hits(content_norm, content_tokens, query_intents)
-
-        should_keep = token_ok or status_ok or fuzzy_score >= 74 or keyword_score > 0 or intent_match_count > 0
-        if should_keep:
-            item["_search_score"] = _compute_adaptive_score(
-                item,
-                q_norm=q_norm,
-                tokens=tokens,
-                expanded_tokens=expanded_tokens,
-                keyword_score=keyword_score,
-                fuzzy_score=fuzzy_score,
-                content_norm=content_norm,
-                query_intents=query_intents,
-            )
-            filtered.append(item)
-
-    if not filtered:
+    # Etape B: fallback flou si aucun candidat index.
+    if not candidates:
         potential = list(things_collection.find({}).limit(400))
         for item in potential:
             focus = _focus_text(item)
-            score = int(fuzz.partial_ratio(q_norm, focus))
-            if score >= 80:
-                item["_search_score"] = score
-                filtered.append(item)
+            fuzzy_score = int(fuzz.partial_ratio(q_norm, focus))
+            if fuzzy_score >= 80:
+                candidates.append(item)
 
-    compute_distance_and_room_flags(filtered, data.user_x, data.user_y, data.user_z, data.user_room)
+    # Etape C: scoreTextuel + bonusSpatial => scoreFinal.
+    compute_distance_and_room_flags(candidates, data.user_x, data.user_y, data.user_z, data.user_room)
 
-    filtered.sort(key=lambda x: (
+    for item in candidates:
+        item_id = str(item.get("id", "")).strip()
+        score_index = int(index_scores.get(item_id, 0))
+        score_pertinence = _weighted_field_score(item, expanded_tokens, q_norm)
+        content_norm = " ".join(normalize_text(f) for f in _extract_searchable_fields(item))
+        content_tokens = _token_set(content_norm)
+        intent_bonus = _intent_hits(content_norm, content_tokens, query_intents) * 20
+        focus = _focus_text(item)
+        fuzzy_score = int(fuzz.partial_ratio(q_norm, focus))
+        fuzzy_bonus = int(round(max(0, fuzzy_score - 60) * 0.25))
+
+        status_bonus = 0
+        if matching_status:
+            item_status = normalize_text(str(item.get("status", item.get("availability", "")))).replace("hors ligne", "hors-ligne")
+            if any(item_status == normalize_text(s).replace("hors ligne", "hors-ligne") for s in matching_status):
+                status_bonus = 15
+
+        # Bonus lexical direct quand la requete apparait textuellement dans les champs metier.
+        fields_norm = [normalize_text(x) for x in _extract_searchable_fields(item)]
+        lexical_hit_bonus = 0
+        if q_norm and any(q_norm in f for f in fields_norm):
+            lexical_hit_bonus += 18
+        for tok in tokens:
+            if tok and any(tok in f for f in fields_norm):
+                lexical_hit_bonus += 4
+        score_textuel = score_index + score_pertinence
+        score_textuel += lexical_hit_bonus + intent_bonus + status_bonus + fuzzy_bonus
+        bonus_spatial = _compute_spatial_bonus(item)
+        item["_score_final"] = int(score_textuel + bonus_spatial)
+
+    # Etape D + E: tri par score final puis tie-break spatial/popularite/nom.
+    candidates.sort(key=lambda x: (
+        -int(x.get("_score_final", 0)),
         0 if x.get("same_room") else 1,
         float(x.get("distance", 10**9)),
         -int(x.get("view_count", 0)),
-        -int(x.get("_search_score", 0)),
         normalize_text(x.get("name", "")),
     ))
 
-    for item in filtered:
+    for item in candidates:
         item["_id"] = str(item["_id"])
-        item.pop("_search_score", None)
+        item.pop("_score_final", None)
 
-    return filtered
+    return candidates
 
 
 class SearchBenchmarkCase(BaseModel):

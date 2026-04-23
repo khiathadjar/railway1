@@ -347,6 +347,19 @@ def get_thing(thing_id: str):
         if "_id" in thing:
             thing["_id"] = str(thing["_id"])
 
+        loc = thing.get("location") if isinstance(thing.get("location"), dict) else {}
+        room_raw = str(loc.get("room") or loc.get("name") or "").strip()
+        if room_raw:
+            room_canonical = _canonical_room_name(room_raw)
+            coords = _coords_from_room(room_canonical)
+            loc["room"] = room_canonical
+            loc["name"] = room_canonical
+            if (coords["x"], coords["y"], coords["z"]) != (0.0, 0.0, 0.0):
+                loc["x"] = coords["x"]
+                loc["y"] = coords["y"]
+                loc["z"] = coords["z"]
+            thing["location"] = loc
+
         return thing
     except HTTPException:
         raise

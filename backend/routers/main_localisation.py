@@ -16,7 +16,7 @@ ROOM_DATA = {
     "Direction Tech": {"x": 30, "y": 210, "z": 40},
     "Board Room": {"x": 40, "y": 210, "z": 40},
     "Lounge 10": {"x": 50, "y": 210, "z": 40},
-    "Archives Executif": {"x": 60, "y": 210, "z": 40},
+    "Archives Direction E10": {"x": 60, "y": 210, "z": 40},
     "NOC 9A": {"x": 10, "y": 190, "z": 36},
     "NOC 9B": {"x": 20, "y": 190, "z": 36},
     "Reseau Core": {"x": 30, "y": 190, "z": 36},
@@ -46,13 +46,13 @@ ROOM_DATA = {
     "Salle Sprint": {"x": 30, "y": 110, "z": 20},
     "Design Studio": {"x": 40, "y": 110, "z": 20},
     "Salle Produit": {"x": 50, "y": 110, "z": 20},
-    "Archives 5": {"x": 60, "y": 110, "z": 20},
+    "Archives E5": {"x": 60, "y": 110, "z": 20},
     "Bureau PDG": {"x": 10, "y": 90, "z": 16},
     "Salle du Conseil": {"x": 20, "y": 90, "z": 16},
     "Salon VIP": {"x": 30, "y": 90, "z": 16},
     "Terrasse Privee": {"x": 40, "y": 90, "z": 16},
     "Secretariat": {"x": 50, "y": 90, "z": 16},
-    "Archives Dir.": {"x": 60, "y": 90, "z": 16},
+    "Archives Direction E4": {"x": 60, "y": 90, "z": 16},
     "Open Space Alpha": {"x": 10, "y": 70, "z": 12},
     "Labo Robotique": {"x": 20, "y": 70, "z": 12},
     "Bureau Lead Dev": {"x": 30, "y": 70, "z": 12},
@@ -62,10 +62,10 @@ ROOM_DATA = {
     "Studio Graphique": {"x": 10, "y": 50, "z": 8},
     "Bureau RH": {"x": 20, "y": 50, "z": 8},
     "Comptabilite": {"x": 30, "y": 50, "z": 8},
-    "Salle de Presse": {"x": 40, "y": 50, "z": 8},
+    "Salle de Presse E2": {"x": 40, "y": 50, "z": 8},
     "Reunion 2B": {"x": 50, "y": 50, "z": 8},
     "Bureau Com": {"x": 50, "y": 50, "z": 8},
-    "Archives": {"x": 60, "y": 50, "z": 8},
+    "Archives E2": {"x": 60, "y": 50, "z": 8},
     "Zone de Stockage": {"x": 10, "y": 30, "z": 4},
     "Atelier Reparation": {"x": 20, "y": 30, "z": 4},
     "Local Serveurs": {"x": 30, "y": 30, "z": 4},
@@ -91,7 +91,10 @@ ROOM_ALIASES = {
     "debug zone": "Zone Debug",
     "studio graph.": "Studio Graphique",
     "compta": "Comptabilite",
-    "presse": "Salle de Presse",
+    "presse": "Salle de Presse E2",
+    "salle de presse": "Salle de Presse E2",
+    "salle du presse": "Salle de Presse E2",
+    "salle presse": "Salle de Presse E2",
     "stockage": "Zone de Stockage",
     "atelier": "Atelier Reparation",
     "serveurs 1": "Local Serveurs",
@@ -102,7 +105,24 @@ ROOM_ALIASES = {
     "cafe": "Cafeteria",
     "cafeteria": "Cafeteria",
     "cafetaria": "Cafeteria",
-    "archives executif": "Archives Executif",
+    "archives executif": "Archives Direction E10",
+    "archives executif e10": "Archives Direction E10",
+    "archives direction e10": "Archives Direction E10",
+    "archive direction e10": "Archives Direction E10",
+    "archive executif": "Archives Direction E10",
+    "archive director": "Archives Direction E10",
+    "archives dir": "Archives Direction E4",
+    "archives dir.": "Archives Direction E4",
+    "archives directeur": "Archives Direction E4",
+    "archivers directeur": "Archives Direction E4",
+    "archives direction": "Archives Direction E4",
+    "archives direction e4": "Archives Direction E4",
+    "archives 5": "Archives E5",
+    "archive 5": "Archives E5",
+    "archives e5": "Archives E5",
+    "archives": "Archives E2",
+    "archive": "Archives E2",
+    "archives e2": "Archives E2",
     "atelier rd": "Atelier R&D",
     "atelier r d": "Atelier R&D",
     "reseau core": "Reseau Core",
@@ -119,7 +139,7 @@ ARCHI_DATA = [
         "id": 10,
         "name": "Etage 10 - Executif",
         "color": 0xDC2626,
-        "rooms": ["Direction Produit", "Direction Ops", "Direction Tech", "Board Room", "Lounge 10", "Archives Executif"],
+        "rooms": ["Direction Produit", "Direction Ops", "Direction Tech", "Board Room", "Lounge 10", "Archives Direction E10"],
     },
     {
         "id": 9,
@@ -149,13 +169,13 @@ ARCHI_DATA = [
         "id": 5,
         "name": "Etage 5 - Collaboration",
         "color": 0x84CC16,
-        "rooms": ["Open Space 5A", "Open Space 5B", "Salle Sprint", "Design Studio", "Salle Produit", "Archives 5"],
+        "rooms": ["Open Space 5A", "Open Space 5B", "Salle Sprint", "Design Studio", "Salle Produit", "Archives E5"],
     },
     {
         "id": 4,
         "name": "Etage 4 - Direction",
         "color": 0xEF4444,
-        "rooms": ["Bureau PDG", "Salle du Conseil", "Salon VIP", "Terrasse Privee", "Secretariat", "Archives Dir."],
+        "rooms": ["Bureau PDG", "Salle du Conseil", "Salon VIP", "Terrasse Privee", "Secretariat", "Archives Direction E4"],
     },
     {
         "id": 3,
@@ -167,7 +187,7 @@ ARCHI_DATA = [
         "id": 2,
         "name": "Etage 2 - Marketing",
         "color": 0xA855F7,
-        "rooms": ["Studio Graphique", "Bureau RH", "Comptabilite", "Salle de Presse", "Reunion 2B", "Bureau Com"],
+        "rooms": ["Studio Graphique", "Bureau RH", "Comptabilite", "Salle de Presse E2", "Reunion 2B", "Bureau Com"],
     },
     {
         "id": 1,
@@ -215,6 +235,21 @@ def canonical_room_name(room: str) -> str:
     alias_target = ROOM_ALIASES.get(room_norm)
     if alias_target:
         return alias_target
+
+    # Heuristiques de secours pour corriger les variantes les plus frequentes.
+    if "presse" in room_norm:
+        return "Salle de Presse E2"
+
+    if "archive" in room_norm or "archives" in room_norm:
+        if any(k in room_norm for k in ["10", "executif", "executive"]):
+            return "Archives Direction E10"
+        if any(k in room_norm for k in ["4", "dir", "directeur", "direction"]):
+            return "Archives Direction E4"
+        if "5" in room_norm:
+            return "Archives E5"
+        if "2" in room_norm:
+            return "Archives E2"
+        return "Archives E2"
 
     return room_raw
 
@@ -282,6 +317,13 @@ def compute_distance_and_room_flags(items: list[dict], user_x: float, user_y: fl
 
         obj_room = canonical_room_name(loc_room or str(loc.get("room", "")))
         same_room = bool(user_room_norm) and (normalize_text(obj_room) == user_room_norm)
+
+        # Harmoniser toujours le nom de salle renvoye au frontend.
+        if obj_room:
+            loc["room"] = obj_room
+            if not str(loc.get("name", "")).strip() or normalize_text(str(loc.get("name", ""))) != normalize_text(obj_room):
+                loc["name"] = obj_room
+            item["location"] = loc
 
         # On privilegie les coordonnees de la salle canonique pour eviter les x/y/z incoherents en base.
         if obj_room:

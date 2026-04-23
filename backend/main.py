@@ -12,7 +12,7 @@ from backend.routers.main_auth import auth_router
 from backend.routers.main_borrow import borrow_router
 from backend.routers.main_crud import crud_router
 from backend.routers.main_devices import devices_router
-from backend.routers.main_localisation import localisation_router
+from backend.routers.main_localisation import canonical_room_name, coords_from_room, localisation_router
 from backend.routers.main_notifications import notifications_router
 from backend.routers.main_recherche import recherche_router
 
@@ -50,6 +50,51 @@ def _initialize_view_counts_on_startup() -> None:
             print(f"Startup init: {result.modified_count} objects received view_count")
     except Exception as exc:
         print(f"View count init failed: {exc}")
+
+
+def _normalize_rooms_on_startup() -> None:
+    """Harmonise les noms de salles existants dans la base (room/name + coords)."""
+    try:
+        rows = list(things_collection.find({}))
+        updated = 0
+
+        for row in rows:
+            loc = row.get("location") if isinstance(row.get("location"), dict) else {}
+            raw_room = str(loc.get("room") or loc.get("name") or "").strip()
+            if not raw_room:
+                continue
+
+            canonical = canonical_room_name(raw_room)
+            coords = coords_from_room(canonical)
+            needs_update = (
+                str(loc.get("room") or "").strip() != canonical
+                or str(loc.get("name") or "").strip() != canonical
+                or float(loc.get("x", 0.0) or 0.0) != float(coords["x"])
+                or float(loc.get("y", 0.0) or 0.0) != float(coords["y"])
+                or float(loc.get("z", 0.0) or 0.0) != float(coords["z"])
+            )
+
+            if not needs_update:
+                continue
+
+            new_loc = dict(loc)
+            new_loc["room"] = canonical
+            new_loc["name"] = canonical
+            if (coords["x"], coords["y"], coords["z"]) != (0.0, 0.0, 0.0):
+                new_loc["x"] = coords["x"]
+                new_loc["y"] = coords["y"]
+                new_loc["z"] = coords["z"]
+
+            things_collection.update_one(
+                {"_id": row.get("_id")},
+                {"$set": {"location": new_loc}},
+            )
+            updated += 1
+
+        if updated > 0:
+            print(f"Startup room normalization: {updated} objects updated")
+    except Exception as exc:
+        print(f"Room normalization failed: {exc}")
 
 
 def _background_cleanup_task() -> None:
@@ -102,6 +147,7 @@ app.include_router(devices_router)
 def on_startup() -> None:
     _cleanup_orphan_keywords_on_startup()
     _initialize_view_counts_on_startup()
+    _normalize_rooms_on_startup()
     _start_cleanup_thread()
 
 

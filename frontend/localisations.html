@@ -506,6 +506,98 @@
         let activeRoomName = '';
         const roomObjectsCache = new Map();
 
+        const ROOM_ALIASES_LOCAL = {
+            'archives dir.': 'Archives Direction E4',
+            'archives dir': 'Archives Direction E4',
+            'archives executif': 'Archives Direction E10',
+            'archives executeif': 'Archives Direction E10',
+            'archives 5': 'Archives E5',
+            'archives': 'Archives E2',
+            'presse': 'Salle de Presse E2',
+            'salle de presse': 'Salle de Presse E2',
+            'salle du presse': 'Salle de Presse E2',
+            'salle conseil': 'Salle du Conseil',
+            'reunion 3a': 'Salle Reunion 3A',
+            'salle reunion 3a': 'Salle Reunion 3A'
+        };
+
+        function _roomByNormalized(normalized) {
+            for (const roomName of Object.keys(ROOM_COORDS)) {
+                if (normalizeText(roomName) === normalized) return roomName;
+            }
+            return '';
+        }
+
+        function canonicalRoomLabel(value) {
+            const raw = String(value || '').trim();
+            if (!raw) return '';
+
+            const normalized = normalizeText(raw);
+            const direct = _roomByNormalized(normalized);
+            if (direct) return direct;
+
+            const alias = ROOM_ALIASES_LOCAL[normalized];
+            if (alias) {
+                const aliasDirect = _roomByNormalized(normalizeText(alias));
+                return aliasDirect || alias;
+            }
+
+            if (normalized.includes('presse')) {
+                const press = _roomByNormalized(normalizeText('Salle de Presse E2'));
+                if (press) return press;
+            }
+
+            if (normalized.includes('archive')) {
+                if (normalized.includes('10') || normalized.includes('executif')) {
+                    return _roomByNormalized(normalizeText('Archives Direction E10')) || 'Archives Direction E10';
+                }
+                if (normalized.includes('4') || normalized.includes('dir') || normalized.includes('directeur') || normalized.includes('direction')) {
+                    return _roomByNormalized(normalizeText('Archives Direction E4')) || 'Archives Direction E4';
+                }
+                if (normalized.includes('5')) {
+                    return _roomByNormalized(normalizeText('Archives E5')) || 'Archives E5';
+                }
+                return _roomByNormalized(normalizeText('Archives E2')) || 'Archives E2';
+            }
+
+            return raw;
+        }
+
+        async function loadLayoutData() {
+            try {
+                const response = await fetch(`${window.APP_CONFIG.API_BASE}/localisation/layout`, { method: 'GET' });
+                if (!response.ok) return;
+                const data = await response.json();
+                const floors = Array.isArray(data?.floors) ? data.floors : [];
+                const coords = (data && data.room_coords && typeof data.room_coords === 'object') ? data.room_coords : null;
+
+                if (floors.length) {
+                    ARCHI_DATA.length = 0;
+                    floors.forEach(function (f) {
+                        ARCHI_DATA.push({
+                            id: Number(f.id),
+                            name: String(f.name || `Etage ${f.id}`),
+                            color: Number(f.color || 0x10b981),
+                            rooms: Array.isArray(f.rooms) ? f.rooms.map(r => String(r || '').trim()).filter(Boolean) : []
+                        });
+                    });
+                }
+
+                if (coords) {
+                    Object.keys(ROOM_COORDS).forEach(function (k) { delete ROOM_COORDS[k]; });
+                    Object.entries(coords).forEach(function ([room, c]) {
+                        ROOM_COORDS[String(room)] = {
+                            x: Number(c?.x || 0),
+                            y: Number(c?.y || 0),
+                            z: Number(c?.z || 0)
+                        };
+                    });
+                }
+            } catch (error) {
+                console.error('Erreur chargement layout canonique:', error);
+            }
+        }
+
         function ensureRoomCoordinates() {
             ARCHI_DATA.forEach(function (floor) {
                 floor.rooms.forEach(function (room, index) {
@@ -531,7 +623,7 @@
         }
 
         function findFloorByRoom(room) {
-            const normalizedRoom = normalizeText(room);
+            const normalizedRoom = normalizeText(canonicalRoomLabel(room));
             const matchedFloor = ARCHI_DATA.find(function (floor) {
                 return Array.isArray(floor.rooms) && floor.rooms.some(function (candidate) {
                     return normalizeText(candidate) === normalizedRoom;
@@ -541,7 +633,7 @@
         }
 
         function findFloorDataByRoom(room) {
-            const normalizedRoom = normalizeText(room);
+            const normalizedRoom = normalizeText(canonicalRoomLabel(room));
             return ARCHI_DATA.find(function (floor) {
                 return floor.rooms.some(function (candidate) {
                     return normalizeText(candidate) === normalizedRoom;
@@ -554,7 +646,7 @@
 
             const floorId = Number(quickFloorSelect.value);
             const floorData = ARCHI_DATA.find(function (floor) { return floor.id === floorId; }) || ARCHI_DATA[0];
-            const targetRoom = String(preferredRoom || '').trim();
+            const targetRoom = canonicalRoomLabel(preferredRoom);
 
             quickRoomSelect.innerHTML = floorData.rooms.map(function (room) {
                 const isSelected = normalizeText(room) === normalizeText(targetRoom);
@@ -581,7 +673,7 @@
         }
 
         function updateCurrentRoomDisplays(room) {
-            const label = String(room || 'Non definie').trim() || 'Non definie';
+            const label = canonicalRoomLabel(room) || 'Non definie';
             const floorName = findFloorByRoom(label);
             activeRoomName = label;
 
@@ -598,6 +690,7 @@
         }
 
         function setMyPos(room) {
+            room = canonicalRoomLabel(room) || room;
             localStorage.setItem('user_room', room);
             const coords = ROOM_COORDS[room] || { x: 0, y: 0, z: 0 };
             localStorage.setItem('user_x', String(coords.x));
@@ -609,6 +702,7 @@
 
         async function loadRoomObjects(roomName) {
             try {
+                roomName = canonicalRoomLabel(roomName) || roomName;
                 const coords = ROOM_COORDS[roomName] || { x: 0, y: 0, z: 0 };
                 const response = await fetch(`${window.APP_CONFIG.API_BASE}/things/search`, {
                     method: 'POST',
@@ -654,8 +748,8 @@
         }
 
         function roomMatchesSelection(itemRoom, selectedRoom) {
-            const itemNorm = normalizeText(itemRoom);
-            const selectedNorm = normalizeText(selectedRoom);
+            const itemNorm = normalizeText(canonicalRoomLabel(itemRoom));
+            const selectedNorm = normalizeText(canonicalRoomLabel(selectedRoom));
             if (!itemNorm || !selectedNorm) return false;
             if (itemNorm === selectedNorm) return true;
             if (itemNorm.includes(selectedNorm) || selectedNorm.includes(itemNorm)) return true;
@@ -1037,7 +1131,8 @@
             animate();
         }
 
-        function init() {
+        async function init() {
+            await loadLayoutData();
             ensureRoomCoordinates();
             const container = document.getElementById('floorContainer');
             container.innerHTML = ARCHI_DATA.map(floor => `
@@ -1051,7 +1146,10 @@
             `).join('');
 
             ARCHI_DATA.forEach(floor => createFloor3D(`canvas-${floor.id}`, floor.rooms, floor.color));
-            const currentRoom = localStorage.getItem('user_room') || "Non definie";
+            const currentRoom = canonicalRoomLabel(localStorage.getItem('user_room') || "") || "Non definie";
+            if (currentRoom && currentRoom !== 'Non definie') {
+                localStorage.setItem('user_room', currentRoom);
+            }
             updateCurrentRoomDisplays(currentRoom);
             populateQuickSelectors(currentRoom);
 
@@ -1070,7 +1168,7 @@
             });
         }
 
-        window.onload = init;
+        window.onload = function () { init(); };
     </script>
     <script src="sidebar-overlay-active.js"></script>
     <script src="admin-reports.js"></script>
